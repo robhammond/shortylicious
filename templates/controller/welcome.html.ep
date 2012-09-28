@@ -1,0 +1,9 @@
+% layout 'default';
+% title 'url shortener';
+<h2><%= $config->{brand} %></h2>
+%= form_for '/' => (method => 'post', class => 'form-inline' ) => begin
+	<input type="text" name="url" placeholder="url">
+	%= text_field 'name', placeholder => 'shortcode', id => 'name'
+	<div id="status"></div>
+	<button id="create" class="btn btn-primary"> create &raquo;</button>
+%= end

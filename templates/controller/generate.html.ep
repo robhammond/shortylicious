@@ -1,0 +1,18 @@
+% layout 'default';
+% title 'url shortened!';
+<h2><%= $config->{brand} %></h2>
+% if ($db_response eq 'ok') {
+<div class="alert alert-success">
+	<b>Success!</b><br><br>
+	<h4><a href="/<%= $name %>"><%= $config->{domain} %>/<%= $name %></a> now points to
+	<a href="<%= $url %>"><%= $url %></a></h4>
+</div>
+
+% } else {
+
+<div class="alert alert-danger">
+	<b>Error creating URL!</b><br><br>
+	<a href="/">Go back</a> &amp; try again!
+</div>
+
+% }

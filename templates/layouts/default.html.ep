@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title><%= title %> | <%= $config->{brand} %></title>
+	<link href="/css/bootstrap.min.css" rel="stylesheet">
+	<style type="text/css">
+		div#status { display: inline; }
+	</style>
+</head>
+<body>
+<div class="navbar">
+	<div class="navbar-inner">
+		<a class="brand" href="/"><%= $config->{brand} %></a>
+	</div>
+</div>
+<div class="container">
+	<%= content %>
+</div>
+<hr>
+<footer style="text-align:center;font-size:90%;">
+	powered by <a href="http://mojolicio.us/">Mojolicious</a>, <a href="http://perl.org/">Perl</a>, <a href="http://couchdb.apache.org/">CouchDB</a> &amp; <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>
+</footer>
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script>
+$(document).ready(function() {
+	$('#name').keyup(function() {
+		if ($(this).val() != '') {
+			$.ajax({
+				url : '/_checkname',
+				data : 'name=' + $(this).val(),
+				success: function(data) {
+					if (data == 'ok') {
+						$('button#create').show();
+						$('#status').html('<span class="label label-success">' + data + '</span>');
+					} else {
+						$('#status').html('<span class="label label-important">' + data + '</span>');
+						$('button#create').hide();
+					}
+				}
+			});
+		} else {
+			$('#status').html('');
+		}
+	});
+});
+</script>
+</body>
+</html>
