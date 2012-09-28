@@ -4,7 +4,10 @@ http://bkx.me/
 Installation:
 -------------
 Only requires Mojolicious to be installed and access to a CouchDB server,
-either installed locally or through a third party service such as www.iriscouch.com
+either installed locally or through a third party service such as www.iriscouch.com.
+
+If you are using a 3rd party CouchDB host you'll most likely need to ensure that
+IO::Socket::SSL is installed so Mojolicious can communicate with the secure host.
 
 Configuration:
 --------------
@@ -15,6 +18,6 @@ Notes:
 ------
  - While CouchDB is currently the only database supported it would be relatively trivial
    to add support for other DBs
- - No hit stats are currently recorded but this would be easy to add into the route subroutine
-   in /lib/ShortyApp/Controller.pm
+ - No hit stats are currently recorded but this would be easy to add into the route 
+   subroutine in /lib/ShortyApp/Controller.pm
  - Only basic HTTP auth is supported for CouchDB right now
