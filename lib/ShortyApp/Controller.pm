@@ -27,7 +27,7 @@ sub generate {
 	}
 
 	# return if URL is blank or doesn't look like a valid URL
-	if (($url eq '') || ($url !~ m{^\w\w+\.\w\w[^<>]*$}i)) {
+	if (($url eq '') || ($url !~ m{^(?:[hf]t?tps?://)?\w+\.\w[^<>]*$}i)) {
 		$self->render( db_response => 'fail', url => $url, name => $name );
 	}
 
@@ -38,7 +38,7 @@ sub generate {
 
 	my $result = couch_insert($db, $url, $name);
 
-	if ($result->{'ok'}) {
+	if (defined($result->{'ok'})) {
 		$self->render( db_response => 'ok', url => $url, name => $name );
 	} else {
 		$self->render( db_response => 'fail', url => $url, name => $name );
