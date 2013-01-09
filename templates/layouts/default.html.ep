@@ -18,7 +18,7 @@
 </div>
 <hr>
 <footer style="text-align:center;font-size:90%;">
-	powered by <a href="http://mojolicio.us/">Mojolicious</a>, <a href="http://perl.org/">Perl</a>, <a href="http://couchdb.apache.org/">CouchDB</a> &amp; <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>
+	powered by <a href="http://mojolicio.us/">Mojolicious</a>, <a href="http://perl.org/">Perl</a>, <a href="http://mongodb.org/">MongoDB</a> &amp; <a href="http://twitter.github.com/bootstrap/">Bootstrap</a>
 </footer>
 <script src="http://code.jquery.com/jquery-latest.js"></script>
 <script src="/js/bootstrap.min.js"></script>

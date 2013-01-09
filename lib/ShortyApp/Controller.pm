@@ -1,6 +1,7 @@
 package ShortyApp::Controller;
 use Mojo::Base 'Mojolicious::Controller';
-use ShortyApp::Couch;
+use MongoDB;
+use DateTime;
 use Mojo::Util qw(url_escape);
 
 sub welcome {
@@ -14,7 +15,8 @@ sub generate {
 
 	my $url 	= $self->param('url')  || '';
 	my $name 	= $self->param('name') || '';
-	my $db 		= _create_dsn($self);
+	my $db 		= $self->db;
+	my $routes  = $db->get_collection( 'routes' );
 
 	# sanitise name
 	$name =~ s![^-0-9a-zA-Z]!!g;
@@ -36,9 +38,14 @@ sub generate {
 		$url = 'http://' . $url;
 	}
 
-	my $result = couch_insert($db, $url, $name);
+	my $result = $routes->insert({
+		_id => $name,
+		url => $url,
+		added => DateTime->now,
+		});
+	my $last_error = $db->last_error();
 
-	if (defined($result->{'ok'})) {
+	if (!defined($last_error->{'err'})) {
 		$self->render( db_response => 'ok', url => $url, name => $name );
 	} else {
 		$self->render( db_response => 'fail', url => $url, name => $name );
@@ -50,23 +57,33 @@ sub generate {
 sub checkname {
 	my $self = shift;
 	my $name = $self->param('name');
-	my $db = _create_dsn($self);
 	my $status;
-	my $result = couch_exists($db, $name);
-	if ($result == 404) {
+	
+	my $db 	   = $self->db;
+	my $routes = $db->get_collection( 'routes' );
+
+	my $res = $routes->find({ _id => $name });
+
+	if ($res->count == 0) {
 		$status = 'ok';
-	} elsif ($result == 200) {
+	} else {
 		$status = 'taken';
 	}
+
 	$self->render( text => $status );
 }
 
 # route shortcodes
 sub route {
-	my $self = shift;
-	my $db = _create_dsn($self);
-	my $router = couch_fetch($db, $self->stash('name'));
+	my $self   = shift;
+	my $db     = $self->db;
+	my $routes = $db->get_collection( 'routes' );
+
+	my $cursor = $routes->find({ _id => $self->stash('name') });
+	my $router = $cursor->next;
+
 	my $redirect = $router->{url};
+	
 	if (defined $redirect) {
 		$self->res->code(301);
 		$self->redirect_to($redirect);
@@ -87,23 +104,5 @@ sub _random_string {
 	return $random_string;
 }
 
-sub _create_dsn {
-  my $self = shift;
-
-  my $couch_url  = $self->{app}->{defaults}->{config}->{couch}->{url};
-  my $couch_db   = $self->{app}->{defaults}->{config}->{couch}->{db};
-  my $couch_usr  = url_escape $self->{app}->{defaults}->{config}->{couch}->{user};
-  my $couch_pass = url_escape $self->{app}->{defaults}->{config}->{couch}->{pass};
-
-  # convert to http basic auth if necessary
-  if ( ($couch_usr ne '') && ($couch_pass ne '') ) {
-    if ($couch_url =~ m{^(https?://)(.*)$}i) {
-      $couch_url = $1 . $couch_usr . ":" . $couch_pass . "@" . $2;
-    }
-  }
-  $couch_url =~ s!^(.*?)/?$!$1/$couch_db/!;
-
-  return $couch_url;
-}
 
 1;
